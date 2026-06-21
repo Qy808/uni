@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Unicode符号查看</title>
+<style>
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --surface-hover: #f0f0f2;
+  --text: #1d1d1f;
+  --text-secondary: #86868b;
+  --accent: #0071e3;
+  --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.14);
+  --shadow: 0 2px 16px rgba(0,0,0,0.06);
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --tab-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --danger: #ff3b30;
+}
+
+html, body {
+  overflow: hidden;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+* { box-sizing: border-box; }
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.top-panel {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 100;
+}
+
+.scroll-panel {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 12px 16px;
+}
+
+.scroll-panel > .container {
+  padding: 28px 24px 40px 24px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.row:last-child { margin-bottom: 0; }
+
+.input-wrap {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+#charInput {
+  width: 100%;
+  padding: 11px 38px 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+  box-shadow: var(--card-shadow);
+}
+
+#charInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,113,227,0.18), var(--card-shadow);
+}
+
+.input-counter {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+button {
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s ease;
+  line-height: 1;
+}
+
+button:active { transform: scale(.92); }
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--card-shadow);
+}
+
+.btn-icon.secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-icon.danger {
+  background: var(--danger);
+}
+
+.btn-icon:hover { filter: brightness(1.1); }
+
+.btn-icon.secondary:hover {
+  background: var(--surface-hover);
+  filter: none;
+}
+
+.btn-copy {
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--card-shadow);
+  font-size: 14px;
+  gap: 6px;
+}
+
+.btn-copy:hover { filter: brightness(1.1); }
+
+.btn-copy:active { transform: scale(.92); }
+
+.row-tabs {
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.tab-group {
+  display: flex;
+  gap: 6px;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab-group::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all .15s ease;
+  white-space: nowrap;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tab-btn:hover {
+  background: var(--surface-hover);
+}
+
+.tab-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+  border-color: var(--border-strong);
+  box-shadow: var(--tab-shadow);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  margin-top: 6px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.list-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  min-width: 0;
+}
+
+.header-count {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 100px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 11px;
+  flex-shrink: 0;
+  box-shadow: var(--card-shadow);
+}
+
+.list-header-right {
+  color: var(--text-secondary);
+  font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, Monaco, monospace;
+  font-size: 12px;
+  letter-spacing: .02em;
+  min-height: 16px;
+  flex-shrink: 0;
+  margin-left: 8px;
+  transition: color .15s ease;
+}
+
+.list-header-right.active {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.virtual-outer {
+  position: relative;
+  width: 100%;
+}
+
+.virtual-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 10px;
+  will-change: transform;
+}
+
+.card {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  line-height: 1;
+  color: var(--text);
+  transition: border-color .15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  min-width: 0;
+  box-shadow: var(--card-shadow);
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  z-index: 2;
+}
+
+.card:active {
+  border-color: var(--accent);
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  background: var(--surface);
+  color: var(--text);
+  padding: 12px 24px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 14px;
+  opacity: 0;
+  transition: all .35s cubic-bezier(.175,.885,.32,1.275);
+  z-index: 2000;
+  pointer-events: none;
+  box-shadow: var(--shadow);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+#sizer {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+  top: -9999px;
+  left: -9999px;
+  display: inline-block;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 100px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+</style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body>
+
+<div class="app">
+  <div class="top-panel">
+    <div class="container">
+      <div class="row">
+        <div class="input-wrap">
+          <input type="text" id="charInput" placeholder="Click a glyph" readonly>
+          <span class="input-counter" id="inputCounter">0</span>
+        </div>
+        <button class="danger btn-icon" id="btnDelete" title="Delete last">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+        </button>
+        <button class="secondary btn-icon" id="btnClear" title="Clear">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
+
+      <div class="row row-tabs">
+        <div class="tab-group" id="tabGroup">
+          <button class="tab-btn active" data-range="braille" id="tabBraille"></button>
+          <button class="tab-btn" data-range="pua" id="tabPua"></button>
+        </div>
+        <button class="btn-copy" id="btnCopy" title="Copy">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="btnCopyText"></span>
+        </button>
+      </div>
+
+      <div class="list-header">
+        <div class="list-header-left">
+          <span id="headerName"></span>
+          <span class="header-count" id="headerCount">256</span>
+        </div>
+        <div class="list-header-right" id="headerCodepoint"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-panel" id="scrollArea">
+    <div class="container">
+      <div class="virtual-outer" id="virtualOuter">
+        <div class="virtual-inner" id="virtualInner"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="sizer"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  var GAP = 10;
+  var BUFFER_ROWS = 3;
+  var BREAKPOINT = 769;
+  var FONT_MIN = 3;
+  var FONT_MAX_CAP = 34;
+  var FIT_RATIO = 0.92;
+  var MAX_ITER = 5;
+
+  var els = {
+    charInput: document.getElementById('charInput'),
+    inputCounter: document.getElementById('inputCounter'),
+    tabGroup: document.getElementById('tabGroup'),
+    btnDelete: document.getElementById('btnDelete'),
+    btnCopy: document.getElementById('btnCopy'),
+    btnCopyText: document.getElementById('btnCopyText'),
+    btnClear: document.getElementById('btnClear'),
+    toast: document.getElementById('toast'),
+    headerName: document.getElementById('headerName'),
+    headerCount: document.getElementById('headerCount'),
+    headerCodepoint: document.getElementById('headerCodepoint'),
+    tabBraille: document.getElementById('tabBraille'),
+    tabPua: document.getElementById('tabPua'),
+    scrollArea: document.getElementById('scrollArea'),
+    outer: document.getElementById('virtualOuter'),
+    inner: document.getElementById('virtualInner'),
+    sizer: document.getElementById('sizer')
+  };
+
+  var currentData = [];
+  var totalRows = 0;
+  var rowHeight = 64;
+  var lastStart = -1, lastEnd = -1;
+  var scrollHandler = null, resizeHandler = null;
+  var currentCols = 6;
+  var cardWidthCache = 0;
+  var fontSizeCache = {};
+  var baseFontSize = 24;
+
+  function getCols() {
+    return window.innerWidth >= BREAKPOINT ? 8 : 6;
+  }
+
+  function formatCP(cp) {
+    var h = cp.toString(16).toUpperCase();
+    return 'U+' + (cp > 0xFFFF ? h.padStart(6, '0') : h.padStart(4, '0'));
+  }
+
+  function showToast(msg) {
+    els.toast.textContent = msg;
+    els.toast.classList.add('show');
+    setTimeout(function() { els.toast.classList.remove('show'); }, 2000);
+  }
+
+  function updateCounter() {
+    var n = Array.from(els.charInput.value).length;
+    els.inputCounter.textContent = n;
+    els.inputCounter.style.color = n > 0 ? 'var(--accent)' : 'var(--text-secondary)';
+  }
+
+  function appendChar(cp) {
+    els.charInput.value += String.fromCodePoint(cp);
+    updateCounter();
+    els.charInput.style.borderColor = 'var(--accent)';
+    setTimeout(function() { els.charInput.style.borderColor = ''; }, 180);
+  }
+
+  function deleteLast() {
+    var arr = Array.from(els.charInput.value);
+    if (!arr.length) return;
+    arr.pop();
+    els.charInput.value = arr.join('');
+    updateCounter();
+  }
+
+  function clearAll() {
+    if (!els.charInput.value) return;
+    els.charInput.value = '';
+    updateCounter();
+    showToast('\u5DF2\u6E05\u7A7A');
+  }
+
+  async function doCopy() {
+    var text = els.charInput.value;
+    if (!text) { showToast('\u8F93\u5165\u6846\u4E3A\u7A7A'); return; }
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('\u5DF2\u590D\u5236 ' + Array.from(text).length + ' \u4E2A\u5B57\u7B26');
+    } catch (e) {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('\u5DF2\u590D\u5236 ' + Array.from(text).length + ' \u4E2A\u5B57\u7B26');
+    }
+  }
+
+  function computeCardWidth() {
+    var w = els.outer.clientWidth;
+    if (!w) return 64;
+    return (w - (currentCols - 1) * GAP) / currentCols;
+  }
+
+  function computeBaseFontSize(cardWidth) {
+    return Math.min(FONT_MAX_CAP, Math.max(FONT_MIN, Math.round(cardWidth * 0.52)));
+  }
+
+  function measureChar(cp, fontSizePx) {
+    els.sizer.textContent = String.fromCodePoint(cp);
+    els.sizer.style.fontSize = fontSizePx + 'px';
+    els.sizer.style.fontFamily = window.getComputedStyle(document.body).fontFamily;
+    return {
+      w: els.sizer.offsetWidth,
+      h: els.sizer.offsetHeight
+    };
+  }
+
+  function getFitFontSize(cp, cardSize, baseSize) {
+    var cacheKey = cp + '-' + Math.round(cardSize);
+    if (fontSizeCache[cacheKey] !== undefined) return fontSizeCache[cacheKey];
+
+    var avail = cardSize * FIT_RATIO;
+    var size = baseSize;
+    var m = measureChar(cp, size);
+
+    if (m.w <= avail && m.h <= avail) {
+      fontSizeCache[cacheKey] = size + 'px';
+      return size + 'px';
+    }
+
+    var iter = 0;
+    while ((m.w > avail || m.h > avail) && size > FONT_MIN && iter < MAX_ITER) {
+      var scale = Math.min(avail / m.w, avail / m.h, 0.95);
+      size = Math.max(FONT_MIN, Math.floor(size * scale));
+      m = measureChar(cp, size);
+      iter++;
+    }
+
+    var result = size + 'px';
+    fontSizeCache[cacheKey] = result;
+    return result;
+  }
+
+  function measure() {
+    var w = els.outer.clientWidth;
+    if (!w) return { rowHeight: 64, cardSize: 64 };
+    var colWidth = (w - (currentCols - 1) * GAP) / currentCols;
+    rowHeight = colWidth + GAP;
+    cardWidthCache = colWidth;
+    baseFontSize = computeBaseFontSize(colWidth);
+    return { rowHeight: rowHeight, cardSize: colWidth };
+  }
+
+  function renderSlice(start, end) {
+    if (start === lastStart && end === lastEnd) return;
+    lastStart = start; lastEnd = end;
+    var startRow = Math.floor(start / currentCols);
+    var offsetY = startRow * rowHeight;
+    els.inner.style.transform = 'translateY(' + offsetY + 'px)';
+
+    var frag = document.createDocumentFragment();
+    var maxW = cardWidthCache || computeCardWidth();
+    var baseSize = baseFontSize || computeBaseFontSize(maxW);
+
+    for (var i = start; i < end; i++) {
+      var cp = currentData[i];
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.textContent = String.fromCodePoint(cp);
+      card.style.fontSize = getFitFontSize(cp, maxW, baseSize);
+
+      card.addEventListener('click', function(cpVal) {
+        return function() { onCardClick(cpVal); };
+      }(cp));
+      frag.appendChild(card);
+    }
+    els.inner.innerHTML = '';
+    els.inner.appendChild(frag);
+  }
+
+  function updateVisibleRange() {
+    var scrollRect = els.scrollArea.getBoundingClientRect();
+    var outerRect = els.outer.getBoundingClientRect();
+    var relativeTop = outerRect.top - scrollRect.top;
+    var visibleTop = Math.max(0, -relativeTop);
+    var visibleBottom = visibleTop + scrollRect.height;
+
+    var startRow = Math.floor(visibleTop / rowHeight);
+    var endRow = Math.ceil(visibleBottom / rowHeight);
+    startRow = Math.max(0, startRow - BUFFER_ROWS);
+    endRow = Math.min(totalRows, endRow + BUFFER_ROWS);
+    renderSlice(startRow * currentCols, Math.min(currentData.length, endRow * currentCols));
+  }
+
+  function initVirtualList(data) {
+    if (scrollHandler) {
+      els.scrollArea.removeEventListener('scroll', scrollHandler, { passive: true });
+      window.removeEventListener('resize', resizeHandler);
+    }
+    currentData = data;
+    currentCols = getCols();
+    els.inner.style.gridTemplateColumns = 'repeat(' + currentCols + ', 1fr)';
+    totalRows = Math.ceil(data.length / currentCols);
+    lastStart = lastEnd = -1;
+    measure();
+    els.outer.style.height = (totalRows * rowHeight) + 'px';
+
+    scrollHandler = function() { window.requestAnimationFrame(updateVisibleRange); };
+    resizeHandler = onResize;
+    els.scrollArea.addEventListener('scroll', scrollHandler, { passive: true });
+    window.addEventListener('resize', resizeHandler);
+    updateVisibleRange();
+  }
+
+  function onResize() {
+    fontSizeCache = {};
+    var newCols = getCols();
+    if (newCols !== currentCols) {
+      currentCols = newCols;
+      els.inner.style.gridTemplateColumns = 'repeat(' + currentCols + ', 1fr)';
+      totalRows = Math.ceil(currentData.length / currentCols);
+      measure();
+      els.outer.style.height = (totalRows * rowHeight) + 'px';
+      lastStart = lastEnd = -1;
+      els.inner.innerHTML = '';
+      updateVisibleRange();
+    } else {
+      measure();
+      els.outer.style.height = (totalRows * rowHeight) + 'px';
+      updateVisibleRange();
+    }
+  }
+
+  function onCardClick(cp) {
+    appendChar(cp);
+    els.headerCodepoint.textContent = formatCP(cp);
+    els.headerCodepoint.classList.add('active');
+  }
+
+  function switchRange(range) {
+    els.tabGroup.querySelectorAll('.tab-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.range === range);
+    });
+
+    var data = [], name = '', cnt = 0;
+    switch (range) {
+      case 'braille':
+        data = Array.from({length: 256}, function(_, i) { return 0x2800 + i; });
+        name = '\u76F2\u6587\u70B9\u5B57'; cnt = 256;
+        break;
+      case 'pua':
+        data = Array.from({length: 6400}, function(_, i) { return 0xE000 + i; });
+        name = '\u79C1\u7528\u533A'; cnt = 6400;
+        break;
+    }
+    els.headerName.textContent = name;
+    els.headerCount.textContent = cnt.toLocaleString();
+    els.headerCodepoint.textContent = '\u70B9\u51FB\u663E\u793A\u7801\u4F4D';
+    els.headerCodepoint.classList.remove('active');
+    els.inner.innerHTML = '';
+    fontSizeCache = {};
+    requestAnimationFrame(function() { initVirtualList(data); });
+  }
+
+  function initLabels() {
+    els.tabBraille.textContent = '\u76F2\u6587\u70B9\u5B57';
+    els.tabPua.textContent = '\u79C1\u7528\u533A';
+    els.btnCopyText.textContent = '\u590D\u5236';
+    els.toast.textContent = '\u5DF2\u590D\u5236';
+  }
+
+  els.btnDelete.addEventListener('click', deleteLast);
+  els.btnCopy.addEventListener('click', doCopy);
+  els.btnClear.addEventListener('click', clearAll);
+
+  els.tabGroup.addEventListener('click', function(e) {
+    var btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    switchRange(btn.dataset.range);
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && document.activeElement !== els.charInput) {
+      deleteLast();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+      els.charInput.select();
+      e.preventDefault();
+    }
+  });
+
+  initLabels();
+  switchRange('braille');
+})();
+</script>
+</body>
+</html>
